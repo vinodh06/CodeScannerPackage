@@ -8,7 +8,7 @@
 import SwiftUI
 import AVFoundation
 
-struct CodeScannerView: View {
+public struct CodeScannerView: View {
     @State var scanResult = ""
     @State var isScanned = false
 
@@ -16,7 +16,13 @@ struct CodeScannerView: View {
     var metaDataObjectTypes: [AVMetadataObject.ObjectType]
     var output: (String) -> Void
 
-    var body: some View {
+    public init(showScanner: Binding<Bool>, metaDataObjectTypes: [AVMetadataObject.ObjectType], output: @escaping (String) -> Void) {
+        self._showScanner = showScanner
+        self.metaDataObjectTypes = metaDataObjectTypes
+        self.output = output
+    }
+
+    public var body: some View {
         CodeScanner(result: $scanResult, isScanned: $isScanned, metaDataObjectTypes: metaDataObjectTypes)
         .onChange(of: isScanned) { _ in
             showScanner = false
