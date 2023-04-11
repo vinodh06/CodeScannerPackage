@@ -22,7 +22,7 @@ let package = Package(
         .target(
             name: "CodeScannerPackage",
             dependencies: [],
-            path: "Sources"),
+            path: "Sources/"),
         .testTarget(
             name: "CodeScannerPackageTests",
             dependencies: ["CodeScannerPackage"]),
