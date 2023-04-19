@@ -58,7 +58,8 @@ public class CodeScannerViewController: UIViewController {
             failed()
             return
         }
-
+        
+        previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
         previewLayer.frame = view.layer.bounds
         previewLayer.videoGravity = .resizeAspectFill
         view.layer.addSublayer(previewLayer)
