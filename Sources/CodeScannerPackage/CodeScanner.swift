@@ -9,8 +9,7 @@ public struct CodeScanner: UIViewControllerRepresentable {
     public var metaDataObjectTypes: [AVMetadataObject.ObjectType]
 
     public func makeUIViewController(context: Context) -> CodeScannerViewController {
-        let controller = CodeScannerViewController()
-        controller.delegate = context.coordinator
+        let controller = CodeScannerViewController(delegate: context.coordinator, metaDataObjectTypes: metaDataObjectTypes)
         return controller
     }
 
