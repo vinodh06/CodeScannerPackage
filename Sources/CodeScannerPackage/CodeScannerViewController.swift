@@ -65,7 +65,7 @@ public class CodeScannerViewController: UIViewController {
         previewLayer.videoGravity = .resizeAspectFill
         view.layer.addSublayer(previewLayer)
 
-        let overlay = createOverlay()
+        let overlay = createOverlay(frame: CGRect(x: 100, y: 100, width: previewLayer.frame.width-200, height: previewLayer.frame.height - 200))
         view.addSubview(overlay)
 
         // Start video capture.
@@ -81,13 +81,13 @@ public class CodeScannerViewController: UIViewController {
         captureSession = nil
     }
 
-    func createOverlay() -> UIView {
+    func createOverlay(frame: CGRect) -> UIView {
         let overlayView = UIView(frame: view.frame)
         overlayView.backgroundColor = UIColor.black.withAlphaComponent(0.7)
 
         let path = CGMutablePath()
 
-        path.addRoundedRect(in: CGRect(x: 100, y: 100, width: overlayView.frame.width-200, height: overlayView.frame.height - 200), cornerWidth: 5, cornerHeight: 5)
+        path.addRoundedRect(in: frame, cornerWidth: 5, cornerHeight: 5)
 
 
         path.closeSubpath()
