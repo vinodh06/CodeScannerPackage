@@ -87,7 +87,7 @@ public class CodeScannerViewController: UIViewController {
 
         let path = CGMutablePath()
 
-        path.addRoundedRect(in: CGRect(x: 50, y: 100, width: overlayView.frame.width-100, height: overlayView.frame.height - 300), cornerWidth: 5, cornerHeight: 5)
+        path.addRoundedRect(in: CGRect(x: 100, y: 100, width: overlayView.frame.width-200, height: overlayView.frame.height - 200), cornerWidth: 5, cornerHeight: 5)
 
 
         path.closeSubpath()
