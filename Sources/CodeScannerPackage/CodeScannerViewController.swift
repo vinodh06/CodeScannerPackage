@@ -58,15 +58,17 @@ public class CodeScannerViewController: UIViewController {
             failed()
             return
         }
-
         
         previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
         previewLayer.frame = view.layer.bounds
         previewLayer.videoGravity = .resizeAspectFill
         view.layer.addSublayer(previewLayer)
 
-        let overlay = createOverlay(frame: CGRect(x: 100, y: 100, width: previewLayer.frame.width-200, height: previewLayer.frame.height - 200))
-        view.addSubview(overlay)
+        let scannerOverlayPreviewLayer              = ScannerOverlayPreviewLayer(session: captureSession)
+        scannerOverlayPreviewLayer.frame            = self.view.bounds
+        scannerOverlayPreviewLayer.maskSize         = CGSize(width: 200, height: 200)
+        scannerOverlayPreviewLayer.videoGravity     = .resizeAspectFill
+        self.view.layer.addSublayer(scannerOverlayPreviewLayer)
 
         // Start video capture.
         DispatchQueue.global(qos: .background).async {
@@ -79,38 +81,6 @@ public class CodeScannerViewController: UIViewController {
         ac.addAction(UIAlertAction(title: "OK", style: .default))
         present(ac, animated: true)
         captureSession = nil
-    }
-
-    func createOverlay(frame: CGRect) -> UIView {
-        let overlayView = UIView(frame: view.frame)
-        overlayView.backgroundColor = UIColor.black.withAlphaComponent(0.7)
-
-        let path = CGMutablePath()
-
-        path.addRoundedRect(in: frame, cornerWidth: 5, cornerHeight: 5)
-
-
-        path.closeSubpath()
-
-        let shape = CAShapeLayer()
-        shape.path = path
-        shape.lineWidth = 5.0
-        shape.strokeColor = UIColor.white.cgColor
-        shape.fillColor = UIColor.white.cgColor
-
-        overlayView.layer.addSublayer(shape)
-
-        path.addRect(CGRect(origin: .zero, size: overlayView.frame.size))
-
-        let maskLayer = CAShapeLayer()
-        maskLayer.backgroundColor = UIColor.black.cgColor
-        maskLayer.path = path
-        maskLayer.fillRule = CAShapeLayerFillRule.evenOdd
-
-        overlayView.layer.mask = maskLayer
-        overlayView.clipsToBounds = true
-
-        return overlayView
     }
 
     public override func viewWillAppear(_ animated: Bool) {
