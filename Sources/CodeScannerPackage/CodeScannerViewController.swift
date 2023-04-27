@@ -1,6 +1,6 @@
 //
 //  CodeScannerViewController.swift
-//  
+//
 //
 //  Created by vinodh kumar on 11/04/23.
 //
@@ -14,11 +14,18 @@ public class CodeScannerViewController: UIViewController {
     var captureSession: AVCaptureSession!
     var previewLayer: AVCaptureVideoPreviewLayer!
     var delegate: AVCaptureMetadataOutputObjectsDelegate?
-    var metaDataObjectTypes: [AVMetadataObject.ObjectType] = []
+    var metaDataObjectTypes: [AVMetadataObject.ObjectType]
+    var boundingBoxSize: CGSize
+    var captureInput : AVCaptureDeviceInput?{
+        get{
+            return self.captureSession?.inputs.first as? AVCaptureDeviceInput
+        }
+    }
 
-    public init(delegate: AVCaptureMetadataOutputObjectsDelegate? = nil, metaDataObjectTypes: [AVMetadataObject.ObjectType]) {
+    public init(delegate: AVCaptureMetadataOutputObjectsDelegate? = nil, metaDataObjectTypes: [AVMetadataObject.ObjectType], boundingBoxSize: CGSize) {
         self.delegate = delegate
         self.metaDataObjectTypes = metaDataObjectTypes
+        self.boundingBoxSize = boundingBoxSize
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -28,8 +35,11 @@ public class CodeScannerViewController: UIViewController {
 
     public override func viewDidLoad() {
         super.viewDidLoad()
-
         view.backgroundColor = UIColor.black
+        self.setupScanner()
+    }
+
+    func setupScanner() {
         captureSession = AVCaptureSession()
 
         guard let videoCaptureDevice = AVCaptureDevice.default(for: .video) else { return }
@@ -58,22 +68,23 @@ public class CodeScannerViewController: UIViewController {
             failed()
             return
         }
-        
+
         previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
         previewLayer.frame = view.layer.bounds
         previewLayer.videoGravity = .resizeAspectFill
         view.layer.addSublayer(previewLayer)
 
-        let scannerOverlayPreviewLayer              = ScannerOverlayPreviewLayer(session: captureSession)
-        scannerOverlayPreviewLayer.frame            = self.view.bounds
-        scannerOverlayPreviewLayer.maskSize         = CGSize(width: 200, height: 200)
-        scannerOverlayPreviewLayer.videoGravity     = .resizeAspectFill
-        self.view.layer.addSublayer(scannerOverlayPreviewLayer)
-
         // Start video capture.
         DispatchQueue.global(qos: .background).async {
             self.captureSession.startRunning()
         }
+    }
+
+    func setupScannerBoundingBox() {
+        let scannerOverlayPreviewLayer              = ScannerOverlayPreviewLayer()
+        scannerOverlayPreviewLayer.frame            = view.layer.bounds
+        scannerOverlayPreviewLayer.maskSize         = boundingBoxSize
+        self.view.layer.addSublayer(scannerOverlayPreviewLayer)
     }
 
     func failed() {
@@ -85,6 +96,8 @@ public class CodeScannerViewController: UIViewController {
 
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+//        self.setupScanner()
+//        self.setupScannerBoundingBox()
         if (captureSession?.isRunning == false) {
             DispatchQueue.global(qos: .background).async {
                 self.captureSession.startRunning()
@@ -107,6 +120,12 @@ public class CodeScannerViewController: UIViewController {
         return .portrait
     }
 
+    public override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+//        self.setupScanner()
+        self.setupScannerBoundingBox()
+    }
+
 }
 
 public class Coordinator: NSObject, AVCaptureMetadataOutputObjectsDelegate {
@@ -114,11 +133,12 @@ public class Coordinator: NSObject, AVCaptureMetadataOutputObjectsDelegate {
     @Binding var scanResult: String
     @Binding var isScanned: Bool
     var metaDataObjectTypes: [AVMetadataObject.ObjectType]
-
-    public init(_ scanResult: Binding<String>, _ isScanned: Binding<Bool>, metaDataObjectTypes: [AVMetadataObject.ObjectType]) {
+    var boundingBoxSize: CGSize = CGSize(width: 200, height: 200)
+    public init(_ scanResult: Binding<String>, _ isScanned: Binding<Bool>, metaDataObjectTypes: [AVMetadataObject.ObjectType], boundingBoxSize: CGSize = CGSize(width: 200, height: 200)) {
         self._scanResult = scanResult
         self._isScanned = isScanned
         self.metaDataObjectTypes = metaDataObjectTypes
+        self.boundingBoxSize = boundingBoxSize
     }
 
     public func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
@@ -137,4 +157,5 @@ public class Coordinator: NSObject, AVCaptureMetadataOutputObjectsDelegate {
         }
     }
 }
+
 

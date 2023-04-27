@@ -1,6 +1,6 @@
 //
-//  File.swift
-//  
+//  ScannerOverlayPreviewLayer.swift
+//
 //
 //  Created by vinodh kumar on 27/04/23.
 //
@@ -116,3 +116,4 @@ internal extension CGPoint {
         return point
     }
 }
+

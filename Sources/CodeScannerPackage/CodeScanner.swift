@@ -1,3 +1,10 @@
+//
+//  CodeScanner.swift
+//
+//
+//  Created by vinodh kumar on 11/04/23.
+//
+
 import UIKit
 import SwiftUI
 import AVFoundation
@@ -6,10 +13,11 @@ public struct CodeScanner: UIViewControllerRepresentable {
 
     @Binding public var result: String
     @Binding public var isScanned: Bool
+    public var boundingBoxSize: CGSize
     public var metaDataObjectTypes: [AVMetadataObject.ObjectType]
 
     public func makeUIViewController(context: Context) -> CodeScannerViewController {
-        let controller = CodeScannerViewController(delegate: context.coordinator, metaDataObjectTypes: metaDataObjectTypes)
+        let controller = CodeScannerViewController(delegate: context.coordinator, metaDataObjectTypes: metaDataObjectTypes, boundingBoxSize: boundingBoxSize)
         return controller
     }
 
@@ -20,3 +28,4 @@ public struct CodeScanner: UIViewControllerRepresentable {
         Coordinator($result, $isScanned, metaDataObjectTypes: metaDataObjectTypes)
     }
 }
+
