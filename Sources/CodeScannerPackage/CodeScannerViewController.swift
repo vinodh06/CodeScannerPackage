@@ -58,11 +58,15 @@ public class CodeScannerViewController: UIViewController {
             failed()
             return
         }
+
         
         previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
         previewLayer.frame = view.layer.bounds
         previewLayer.videoGravity = .resizeAspectFill
         view.layer.addSublayer(previewLayer)
+
+        let overlay = createOverlay()
+        view.addSubview(overlay)
 
         // Start video capture.
         DispatchQueue.global(qos: .background).async {
@@ -75,6 +79,38 @@ public class CodeScannerViewController: UIViewController {
         ac.addAction(UIAlertAction(title: "OK", style: .default))
         present(ac, animated: true)
         captureSession = nil
+    }
+
+    func createOverlay() -> UIView {
+        let overlayView = UIView(frame: view.frame)
+        overlayView.backgroundColor = UIColor.black.withAlphaComponent(0.7)
+
+        let path = CGMutablePath()
+
+        path.addRoundedRect(in: CGRect(x: 50, y: 100, width: overlayView.frame.width-100, height: overlayView.frame.height - 300), cornerWidth: 5, cornerHeight: 5)
+
+
+        path.closeSubpath()
+
+        let shape = CAShapeLayer()
+        shape.path = path
+        shape.lineWidth = 5.0
+        shape.strokeColor = UIColor.white.cgColor
+        shape.fillColor = UIColor.white.cgColor
+
+        overlayView.layer.addSublayer(shape)
+
+        path.addRect(CGRect(origin: .zero, size: overlayView.frame.size))
+
+        let maskLayer = CAShapeLayer()
+        maskLayer.backgroundColor = UIColor.black.cgColor
+        maskLayer.path = path
+        maskLayer.fillRule = CAShapeLayerFillRule.evenOdd
+
+        overlayView.layer.mask = maskLayer
+        overlayView.clipsToBounds = true
+
+        return overlayView
     }
 
     public override func viewWillAppear(_ animated: Bool) {
