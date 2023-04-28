@@ -14,13 +14,8 @@ public class CodeScannerViewController: UIViewController {
     var captureSession: AVCaptureSession!
     var previewLayer: AVCaptureVideoPreviewLayer!
     var delegate: AVCaptureMetadataOutputObjectsDelegate?
-    var metaDataObjectTypes: [AVMetadataObject.ObjectType]
+    var metaDataObjectTypes: [AVMetadataObject.ObjectType] = []
     var boundingBoxSize: CGSize
-    var captureInput : AVCaptureDeviceInput?{
-        get{
-            return self.captureSession?.inputs.first as? AVCaptureDeviceInput
-        }
-    }
 
     public init(delegate: AVCaptureMetadataOutputObjectsDelegate? = nil, metaDataObjectTypes: [AVMetadataObject.ObjectType], boundingBoxSize: CGSize) {
         self.delegate = delegate
@@ -37,6 +32,43 @@ public class CodeScannerViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = UIColor.black
         self.setupScanner()
+    }
+
+    func failed() {
+        let ac = UIAlertController(title: "Scanning not supported", message: "Your device does not support scanning a code from an item. Please use a device with a camera.", preferredStyle: .alert)
+        ac.addAction(UIAlertAction(title: "OK", style: .default))
+        present(ac, animated: true)
+        captureSession = nil
+    }
+
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if (captureSession?.isRunning == false) {
+            DispatchQueue.global(qos: .background).async {
+                self.captureSession.startRunning()
+            }
+        }
+    }
+
+    public override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        if (captureSession?.isRunning == true) {
+            captureSession.stopRunning()
+        }
+    }
+
+    public override var prefersStatusBarHidden: Bool {
+        return true
+    }
+
+    public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return .portrait
+    }
+
+    public override func viewDidLayoutSubviews() {
+        self.setupScanner()
+        self.setupScannerBoundingBox()
+        super.viewDidLayoutSubviews()
     }
 
     func setupScanner() {
@@ -84,46 +116,8 @@ public class CodeScannerViewController: UIViewController {
         let scannerOverlayPreviewLayer              = ScannerOverlayPreviewLayer()
         scannerOverlayPreviewLayer.frame            = view.layer.bounds
         scannerOverlayPreviewLayer.maskSize         = boundingBoxSize
+        scannerOverlayPreviewLayer.videoGravity     = .resizeAspectFill
         self.view.layer.addSublayer(scannerOverlayPreviewLayer)
-    }
-
-    func failed() {
-        let ac = UIAlertController(title: "Scanning not supported", message: "Your device does not support scanning a code from an item. Please use a device with a camera.", preferredStyle: .alert)
-        ac.addAction(UIAlertAction(title: "OK", style: .default))
-        present(ac, animated: true)
-        captureSession = nil
-    }
-
-    public override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-//        self.setupScanner()
-//        self.setupScannerBoundingBox()
-        if (captureSession?.isRunning == false) {
-            DispatchQueue.global(qos: .background).async {
-                self.captureSession.startRunning()
-            }
-        }
-    }
-
-    public override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        if (captureSession?.isRunning == true) {
-            captureSession.stopRunning()
-        }
-    }
-
-    public override var prefersStatusBarHidden: Bool {
-        return true
-    }
-
-    public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        return .portrait
-    }
-
-    public override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-//        self.setupScanner()
-        self.setupScannerBoundingBox()
     }
 
 }
@@ -133,8 +127,9 @@ public class Coordinator: NSObject, AVCaptureMetadataOutputObjectsDelegate {
     @Binding var scanResult: String
     @Binding var isScanned: Bool
     var metaDataObjectTypes: [AVMetadataObject.ObjectType]
-    var boundingBoxSize: CGSize = CGSize(width: 200, height: 200)
-    public init(_ scanResult: Binding<String>, _ isScanned: Binding<Bool>, metaDataObjectTypes: [AVMetadataObject.ObjectType], boundingBoxSize: CGSize = CGSize(width: 200, height: 200)) {
+    var boundingBoxSize: CGSize
+
+    public init(_ scanResult: Binding<String>, _ isScanned: Binding<Bool>, metaDataObjectTypes: [AVMetadataObject.ObjectType], boundingBoxSize: CGSize) {
         self._scanResult = scanResult
         self._isScanned = isScanned
         self.metaDataObjectTypes = metaDataObjectTypes

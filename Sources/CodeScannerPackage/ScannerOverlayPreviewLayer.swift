@@ -116,4 +116,3 @@ internal extension CGPoint {
         return point
     }
 }
-

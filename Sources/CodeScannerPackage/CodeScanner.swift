@@ -13,8 +13,8 @@ public struct CodeScanner: UIViewControllerRepresentable {
 
     @Binding public var result: String
     @Binding public var isScanned: Bool
-    public var boundingBoxSize: CGSize
     public var metaDataObjectTypes: [AVMetadataObject.ObjectType]
+    public var boundingBoxSize: CGSize
 
     public func makeUIViewController(context: Context) -> CodeScannerViewController {
         let controller = CodeScannerViewController(delegate: context.coordinator, metaDataObjectTypes: metaDataObjectTypes, boundingBoxSize: boundingBoxSize)
@@ -25,7 +25,7 @@ public struct CodeScanner: UIViewControllerRepresentable {
     }
 
     public func makeCoordinator() -> Coordinator {
-        Coordinator($result, $isScanned, metaDataObjectTypes: metaDataObjectTypes)
+        Coordinator($result, $isScanned, metaDataObjectTypes: metaDataObjectTypes, boundingBoxSize: boundingBoxSize)
     }
 }
 
