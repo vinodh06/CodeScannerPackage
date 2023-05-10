@@ -1,0 +1,82 @@
+//
+//  ScannerBoundingBoxView.swift
+//  ScannerPOC
+//
+//  Created by vinodh kumar on 10/05/23.
+//
+
+import UIKit
+
+class CodeScannerBoundingBoxView: UIView {
+
+    var cornerLength: CGFloat = 30
+    var lineWidth: CGFloat = 1
+    var lineColor: UIColor = .white
+    var lineCap: CAShapeLayerLineCap = .round
+    var maskSize: CGSize = .zero
+    var animationDuration: Double = 0.5
+
+    init(frame: CGRect = .zero, lineWidth: CGFloat = 1, lineColor: UIColor = .white, maskSize: CGSize = .zero, animationDuration: Double = 0.5) {
+        self.lineWidth = lineWidth
+        self.lineColor = lineColor
+        self.maskSize = maskSize
+        self.animationDuration = animationDuration
+        super.init(frame: frame)
+        self.setupBorderLayer()
+        self.addAnimatingBarInMask()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        self.setupBorderLayer()
+        self.addAnimatingBarInMask()
+    }
+
+    private var maskContainer: CGRect {
+        CGRect(x: (bounds.width / 2) - (maskSize.width / 2),
+               y: (bounds.height / 2) - (maskSize.height / 2),
+               width: maskSize.width, height: maskSize.height)
+    }
+
+    func setupBorderLayer() {
+        let path = CGMutablePath()
+        path.addRect(bounds)
+        path.addRoundedRect(in: maskContainer, cornerWidth: layer.cornerRadius, cornerHeight: layer.cornerRadius)
+
+        let maskLayer = CAShapeLayer()
+        maskLayer.path = path
+        maskLayer.fillColor = UIColor.black.withAlphaComponent(0.65).cgColor
+        maskLayer.fillRule = .evenOdd
+        layer.addSublayer(maskLayer)
+
+        let rectPath = UIBezierPath(rect: maskContainer)
+        let borderLayer = CAShapeLayer()
+        borderLayer.path = rectPath.cgPath
+        borderLayer.strokeColor = lineColor.cgColor
+        borderLayer.fillColor = UIColor.clear.cgColor
+        borderLayer.lineWidth = lineWidth
+        borderLayer.lineCap = lineCap
+        layer.addSublayer(borderLayer)
+    }
+
+    func addAnimatingBarInMask() {
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.frame = CGRect(x: maskContainer.minX, y: maskContainer.minY, width: maskContainer.width, height: maskContainer.height / 2)
+        gradientLayer.colors = [lineColor.withAlphaComponent(0.5).cgColor,
+                                lineColor.withAlphaComponent(0.2).cgColor,
+                                lineColor.withAlphaComponent(0.1).cgColor,
+                                lineColor.withAlphaComponent(0.05).cgColor,
+                                UIColor.clear.cgColor
+        ]
+        self.layer.addSublayer(gradientLayer)
+
+        let animation = CABasicAnimation(keyPath: "position.y")
+        animation.fromValue = NSNumber(value: maskContainer.minY + maskContainer.height / 4)
+        animation.toValue = NSNumber(value: maskContainer.maxY - maskContainer.height / 16)
+        animation.duration = animationDuration
+        animation.repeatCount = .infinity
+        animation.autoreverses = true
+        gradientLayer.add(animation, forKey: "position.y")
+    }
+}
+

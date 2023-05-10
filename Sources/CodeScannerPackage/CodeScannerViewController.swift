@@ -15,12 +15,20 @@ public class CodeScannerViewController: UIViewController {
     var previewLayer: AVCaptureVideoPreviewLayer!
     var delegate: AVCaptureMetadataOutputObjectsDelegate?
     var metaDataObjectTypes: [AVMetadataObject.ObjectType] = []
-    var boundingBoxSize: CGSize
+    var boundingBoxSize: CGSize = .zero
+    var maskBorderColor = UIColor.white
+    var animationDuration: Double = 0.5
 
-    public init(delegate: AVCaptureMetadataOutputObjectsDelegate? = nil, metaDataObjectTypes: [AVMetadataObject.ObjectType], boundingBoxSize: CGSize) {
+    private var maskContainer: CGRect {
+        CGRect(x: (view.bounds.width / 2) - (boundingBoxSize.width / 2),
+               y: (view.bounds.height / 2) - (boundingBoxSize.height / 2),
+               width: boundingBoxSize.width, height: boundingBoxSize.height)
+    }
+
+    private var scannerBoundingBoxView: CodeScannerBoundingBoxView?
+
+    public init(delegate: AVCaptureMetadataOutputObjectsDelegate? = nil) {
         self.delegate = delegate
-        self.metaDataObjectTypes = metaDataObjectTypes
-        self.boundingBoxSize = boundingBoxSize
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -113,37 +121,39 @@ public class CodeScannerViewController: UIViewController {
     }
 
     func setupScannerBoundingBox() {
-        let scannerOverlayPreviewLayer              = ScannerOverlayPreviewLayer()
-        scannerOverlayPreviewLayer.frame            = view.layer.bounds
-        scannerOverlayPreviewLayer.maskSize         = boundingBoxSize
-        scannerOverlayPreviewLayer.videoGravity     = .resizeAspectFill
-        self.view.layer.addSublayer(scannerOverlayPreviewLayer)
+        scannerBoundingBoxView?.layer.removeAllAnimations()
+        scannerBoundingBoxView?.layer.removeFromSuperlayer()
+        scannerBoundingBoxView = CodeScannerBoundingBoxView(frame: view.layer.bounds,lineWidth: 2, lineColor: maskBorderColor, maskSize: boundingBoxSize, animationDuration: animationDuration)
+        self.view.addSubview(scannerBoundingBoxView!)
     }
 
+    public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        coordinator.animate(alongsideTransition: nil, completion: { _ in
+            // called right after rotation transition ends
+            self.view.setNeedsLayout()
+        })
+    }
 }
 
 public class Coordinator: NSObject, AVCaptureMetadataOutputObjectsDelegate {
 
     @Binding var scanResult: String
     @Binding var isScanned: Bool
-    var metaDataObjectTypes: [AVMetadataObject.ObjectType]
-    var boundingBoxSize: CGSize
+    var metaDataObjectTypes: [AVMetadataObject.ObjectType] = []
+    var boundingBoxSize: CGSize = .zero
 
-    public init(_ scanResult: Binding<String>, _ isScanned: Binding<Bool>, metaDataObjectTypes: [AVMetadataObject.ObjectType], boundingBoxSize: CGSize) {
+    public init(_ scanResult: Binding<String>, _ isScanned: Binding<Bool>) {
         self._scanResult = scanResult
         self._isScanned = isScanned
-        self.metaDataObjectTypes = metaDataObjectTypes
-        self.boundingBoxSize = boundingBoxSize
     }
 
     public func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
-
         // Check if the metadataObjects array is not nil and it contains at least one object.
         if metadataObjects.count == 0 {
             scanResult = ""
             return
         }
-
         // Get the metadata object.
         let metadataObj = metadataObjects[0] as! AVMetadataMachineReadableCodeObject
         if self.metaDataObjectTypes.contains(metadataObj.type), let result = metadataObj.stringValue {
@@ -152,5 +162,6 @@ public class Coordinator: NSObject, AVCaptureMetadataOutputObjectsDelegate {
         }
     }
 }
+
 
 
