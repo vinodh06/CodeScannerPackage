@@ -18,6 +18,11 @@ public struct CodeScanner: UIViewControllerRepresentable {
     var maskBorderColor: UIColor = UIColor.white
     var animationDuration: Double = 0.5
 
+    public init(result: Binding<String>, isScanned: Binding<Bool>) {
+        self._result = result
+        self._isScanned = isScanned
+    }
+
     public func makeUIViewController(context: Context) -> CodeScannerViewController {
         let controller = CodeScannerViewController(delegate: context.coordinator)
         return controller
@@ -35,19 +40,19 @@ public struct CodeScanner: UIViewControllerRepresentable {
 }
 
 extension CodeScanner {
-    func metadataObjectTypes(_ metadataObjects: [AVMetadataObject.ObjectType]) -> CodeScanner {
+    public func metadataObjectTypes(_ metadataObjects: [AVMetadataObject.ObjectType]) -> CodeScanner {
         var view = self
         view.metaDataObjectTypes = metadataObjects
         return view
     }
 
-    func boundingBoxSize(_ size: CGSize) -> CodeScanner {
+    public func boundingBoxSize(_ size: CGSize) -> CodeScanner {
         var view = self
         view.boundingBoxSize = size
         return view
     }
 
-    func maskBorderColor(_ color: Color) -> CodeScanner {
+    public func maskBorderColor(_ color: Color) -> CodeScanner {
         var view = self
         view.maskBorderColor = UIColor(color)
         return view
