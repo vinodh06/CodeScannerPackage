@@ -44,8 +44,18 @@ public class CodeScannerViewController: UIViewController {
     }
 
     func scanningNotSupportedError() {
-        let alertController = UIAlertController(title: "Scanning not supported", message: "Your device does not support scanning a code from an item. Please use a device with a camera.", preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: "OK", style: .default))
+        let alertController = UIAlertController(
+            title: Constants.cameraFailureTitle(),
+            message: Constants.cameraFailureDescription(),
+            preferredStyle: .alert
+        )
+        alertController.addAction(
+            UIAlertAction(
+                title: Constants.cameraFailureButtonTitle(),
+                style: .default
+            )
+        )
+
         present(alertController, animated: true)
         captureSession = nil
     }
@@ -53,7 +63,7 @@ public class CodeScannerViewController: UIViewController {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        if (captureSession?.isRunning == false) {
+        if captureSession?.isRunning == false {
             DispatchQueue.global(qos: .background).async {
                 self.captureSession.startRunning()
             }
@@ -63,7 +73,7 @@ public class CodeScannerViewController: UIViewController {
     public override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
 
-        if (captureSession?.isRunning == true) {
+        if captureSession?.isRunning == true {
             captureSession.stopRunning()
         }
     }
@@ -132,7 +142,13 @@ public class CodeScannerViewController: UIViewController {
     func setupScannerBoundingBox() {
         scannerBoundingBoxView?.layer.removeAllAnimations()
         scannerBoundingBoxView?.layer.removeFromSuperlayer()
-        scannerBoundingBoxView = CodeScannerBoundingBoxView(frame: view.layer.bounds,lineWidth: 2, lineColor: maskBorderColor, maskSize: boundingBoxSize, animationDuration: animationDuration)
+        scannerBoundingBoxView = CodeScannerBoundingBoxView(
+            frame: view.layer.bounds,
+            lineWidth: 2,
+            lineColor: maskBorderColor,
+            maskSize: boundingBoxSize,
+            animationDuration: animationDuration
+        )
         view.addSubview(scannerBoundingBoxView!)
     }
 
@@ -163,8 +179,9 @@ public class Coordinator: NSObject, AVCaptureMetadataOutputObjectsDelegate {
             return
         }
         // Get the metadata object.
-        let metadataObj = metadataObjects[0] as! AVMetadataMachineReadableCodeObject
-        if metaDataObjectTypes.contains(metadataObj.type), let result = metadataObj.stringValue {
+        if let metadataObj = metadataObjects[0] as? AVMetadataMachineReadableCodeObject,
+           metaDataObjectTypes.contains(metadataObj.type),
+           let result = metadataObj.stringValue {
             scanResult = result
         }
     }
