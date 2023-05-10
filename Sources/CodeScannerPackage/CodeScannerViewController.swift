@@ -18,7 +18,7 @@ public class CodeScannerViewController: UIViewController {
     var boundingBoxSize: CGSize = .zero
     var maskBorderColor = UIColor.white
     var animationDuration: Double = 0.5
-    var scannedCode: String?
+    var isScannerSupported = true
 
     private var maskContainer: CGRect {
         CGRect(x: (view.bounds.width / 2) - (boundingBoxSize.width / 2),
@@ -41,10 +41,11 @@ public class CodeScannerViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
 
-        setupScanner()
+//        setupScanner()
     }
 
     func scanningNotSupportedError() {
+        isScannerSupported = false
         let alertController = UIAlertController(
             title: Constants.cameraFailureTitle(),
             message: Constants.cameraFailureDescription(),
@@ -55,7 +56,7 @@ public class CodeScannerViewController: UIViewController {
                 title: Constants.cameraFailureButtonTitle(),
                 style: .default
             ) { [weak self] _ in
-                self?.scannedCode = nil
+                self?.dismiss(animated: true)
             }
         )
 
@@ -90,8 +91,10 @@ public class CodeScannerViewController: UIViewController {
     }
 
     public override func viewDidLayoutSubviews() {
-        setupScanner()
-        setupScannerBoundingBox()
+        if isScannerSupported {
+            setupScanner()
+            setupScannerBoundingBox()
+        }
 
         super.viewDidLayoutSubviews()
     }
