@@ -11,21 +11,18 @@ import AVFoundation
 
 public struct CodeScanner: UIViewControllerRepresentable {
 
-    @Binding public var result: String
-    @Binding public var isScanned: Bool
+    @Binding public var result: String?
     var metaDataObjectTypes: [AVMetadataObject.ObjectType] = []
     var boundingBoxSize: CGSize = .zero
     var maskBorderColor: UIColor = UIColor.white
     var animationDuration: Double = 0.5
 
-    public init(result: Binding<String>, isScanned: Binding<Bool>) {
-        self._result = result
-        self._isScanned = isScanned
+    public init(result: Binding<String?>) {
+        _result = result
     }
 
     public func makeUIViewController(context: Context) -> CodeScannerViewController {
-        let controller = CodeScannerViewController(delegate: context.coordinator)
-        return controller
+        CodeScannerViewController(delegate: context.coordinator)
     }
 
     public func updateUIViewController(_ uiViewController: CodeScannerViewController, context: Context) {
@@ -35,7 +32,7 @@ public struct CodeScanner: UIViewControllerRepresentable {
     }
 
     public func makeCoordinator() -> Coordinator {
-        Coordinator($result, $isScanned)
+        Coordinator($result)
     }
 }
 
@@ -58,9 +55,9 @@ extension CodeScanner {
         return view
     }
 
-    public func animationDuration(_ animDuration: Double) -> CodeScanner {
+    public func animationDuration(_ animationDuration: Double) -> CodeScanner {
         var view = self
-        view.animationDuration = animDuration
+        view.animationDuration = animationDuration
         return view
     }
 }

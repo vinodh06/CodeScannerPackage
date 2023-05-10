@@ -9,25 +9,27 @@ import UIKit
 
 class CodeScannerBoundingBoxView: UIView {
 
-    var cornerLength: CGFloat = 30
-    var lineWidth: CGFloat = 1
-    var lineColor: UIColor = .white
-    var lineCap: CAShapeLayerLineCap = .round
-    var maskSize: CGSize = .zero
-    var animationDuration: Double = 0.5
+    var lineWidth = CGFloat(1.0)
+    var lineColor = UIColor.white
+    var lineCap = CAShapeLayerLineCap.round
+    var maskSize = CGSize.zero
+    var animationDuration = 0.5
 
     init(frame: CGRect = .zero, lineWidth: CGFloat = 1, lineColor: UIColor = .white, maskSize: CGSize = .zero, animationDuration: Double = 0.5) {
         self.lineWidth = lineWidth
         self.lineColor = lineColor
         self.maskSize = maskSize
         self.animationDuration = animationDuration
+
         super.init(frame: frame)
-        self.setupBorderLayer()
-        self.addAnimatingBarInMask()
+
+        setupBorderLayer()
+        addAnimatingBarInMask()
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
+
         self.setupBorderLayer()
         self.addAnimatingBarInMask()
     }
@@ -35,7 +37,8 @@ class CodeScannerBoundingBoxView: UIView {
     private var maskContainer: CGRect {
         CGRect(x: (bounds.width / 2) - (maskSize.width / 2),
                y: (bounds.height / 2) - (maskSize.height / 2),
-               width: maskSize.width, height: maskSize.height)
+               width: maskSize.width,
+               height: maskSize.height)
     }
 
     func setupBorderLayer() {
@@ -45,7 +48,7 @@ class CodeScannerBoundingBoxView: UIView {
 
         let maskLayer = CAShapeLayer()
         maskLayer.path = path
-        maskLayer.fillColor = UIColor.black.withAlphaComponent(0.65).cgColor
+        maskLayer.fillColor = UIColor.clear.cgColor
         maskLayer.fillRule = .evenOdd
         layer.addSublayer(maskLayer)
 
@@ -68,7 +71,7 @@ class CodeScannerBoundingBoxView: UIView {
                                 lineColor.withAlphaComponent(0.05).cgColor,
                                 UIColor.clear.cgColor
         ]
-        self.layer.addSublayer(gradientLayer)
+        layer.addSublayer(gradientLayer)
 
         let animation = CABasicAnimation(keyPath: "position.y")
         animation.fromValue = NSNumber(value: maskContainer.minY + maskContainer.height / 4)
