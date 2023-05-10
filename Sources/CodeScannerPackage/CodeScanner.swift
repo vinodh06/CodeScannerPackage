@@ -58,7 +58,7 @@ extension CodeScanner {
         return view
     }
 
-    func animationDuration(_ animDuration: Double) -> CodeScanner {
+    public func animationDuration(_ animDuration: Double) -> CodeScanner {
         var view = self
         view.animationDuration = animDuration
         return view
