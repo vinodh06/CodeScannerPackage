@@ -40,27 +40,25 @@ public class CodeScannerViewController: UIViewController {
 
     public override func viewDidLoad() {
         super.viewDidLoad()
-
-//        setupScanner()
     }
 
     func scanningNotSupportedError() {
         isScannerSupported = false
-        let alertController = UIAlertController(
-            title: Constants.cameraFailureTitle(),
-            message: Constants.cameraFailureDescription(),
-            preferredStyle: .alert
-        )
-        alertController.addAction(
-            UIAlertAction(
-                title: Constants.cameraFailureButtonTitle(),
-                style: .default
-            ) { [weak self] _ in
-                self?.dismiss(animated: true)
-            }
-        )
-
-        present(alertController, animated: true)
+//        let alertController = UIAlertController(
+//            title: Constants.cameraFailureTitle(),
+//            message: Constants.cameraFailureDescription(),
+//            preferredStyle: .alert
+//        )
+//        alertController.addAction(
+//            UIAlertAction(
+//                title: Constants.cameraFailureButtonTitle(),
+//                style: .default
+//            ) { [weak self] _ in
+//                self?.dismiss(animated: true)
+//            }
+//        )
+//
+//        present(alertController, animated: true)
         captureSession = nil
     }
 
