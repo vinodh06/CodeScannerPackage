@@ -18,6 +18,7 @@ public class CodeScannerViewController: UIViewController {
     var boundingBoxSize: CGSize = .zero
     var maskBorderColor = UIColor.white
     var animationDuration: Double = 0.5
+    var scannedCode: String?
 
     private var maskContainer: CGRect {
         CGRect(x: (view.bounds.width / 2) - (boundingBoxSize.width / 2),
@@ -53,7 +54,9 @@ public class CodeScannerViewController: UIViewController {
             UIAlertAction(
                 title: Constants.cameraFailureButtonTitle(),
                 style: .default
-            )
+            ) { [weak self] _ in
+                self?.scannedCode = nil
+            }
         )
 
         present(alertController, animated: true)
