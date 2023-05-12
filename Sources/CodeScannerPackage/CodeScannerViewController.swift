@@ -18,7 +18,7 @@ public class CodeScannerViewController: UIViewController {
     var boundingBoxSize: CGSize = .zero
     var maskBorderColor = UIColor.white
     var animationDuration: Double = 0.5
-    var isScannerSupported = true
+    var isScannerSupported = false
     var showBorderScanner = true
     var failureAlertTexts: FailureAlertText
 
@@ -134,6 +134,8 @@ public class CodeScannerViewController: UIViewController {
             scanningNotSupportedError()
             return
         }
+
+        isScannerSupported = true
 
         previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
         previewLayer.frame = view.layer.bounds
