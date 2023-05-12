@@ -17,11 +17,10 @@ public struct CodeScanner: UIViewControllerRepresentable {
     var boundingBoxSize: CGSize = .zero
     var maskBorderColor: UIColor = UIColor.white
     var animationDuration: Double = 0.5
-    var isAnimateScanner: Bool
+    var isAnimateScanner: Bool = true
 
-    public init(result: Binding<String?>, isAnimateScanner: Bool) {
+    public init(result: Binding<String?>) {
         _result = result
-        self.isAnimateScanner = isAnimateScanner
     }
 
     public func makeUIViewController(context: Context) -> CodeScannerViewController {
