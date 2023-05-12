@@ -43,7 +43,6 @@ public class CodeScannerViewController: UIViewController {
 
     public override func viewDidLoad() {
         super.viewDidLoad()
-        setupScanner()
     }
 
     func scanningNotSupportedError() {
@@ -69,6 +68,7 @@ public class CodeScannerViewController: UIViewController {
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
+        setupScanner()
         if captureSession?.isRunning == false {
             DispatchQueue.global(qos: .background).async {
                 self.captureSession.startRunning()
