@@ -66,15 +66,15 @@ extension CodeScanner {
         return view
     }
 
-    public func animationDuration(_ animationDuration: Double) -> CodeScanner {
+    public func animationDuration(_ duration: Double) -> CodeScanner {
         var view = self
-        view.animationDuration = animationDuration
+        view.animationDuration = duration
         return view
     }
 
-    public func animateScanner(_ showScannerBox: Bool) -> CodeScanner {
+    public func showScannerbox(_ isShow: Bool) -> CodeScanner {
         var view = self
-        view.showScannerBox = showScannerBox
+        view.showScannerBox = isShow
         return view
     }
 }

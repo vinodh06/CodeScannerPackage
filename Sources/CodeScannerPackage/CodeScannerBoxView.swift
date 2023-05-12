@@ -7,7 +7,7 @@
 
 import UIKit
 
-class CodeScannerBoundingBoxView: UIView {
+class CodeScannerBoxView: UIView {
 
     var lineWidth: CGFloat
     var lineColor: UIColor
@@ -15,7 +15,14 @@ class CodeScannerBoundingBoxView: UIView {
     var maskSize: CGSize
     var animationDuration: Double
 
-    init(frame: CGRect = .zero, lineWidth: CGFloat = 1, lineColor: UIColor = .white, lineCap: CAShapeLayerLineCap = CAShapeLayerLineCap.round, maskSize: CGSize = .zero, animationDuration: Double = 0.5) {
+    init(
+        frame: CGRect = .zero,
+        lineWidth: CGFloat = 1,
+        lineColor: UIColor = .white,
+        lineCap: CAShapeLayerLineCap = CAShapeLayerLineCap.round,
+        maskSize: CGSize = .zero,
+        animationDuration: Double = 0.5
+    ) {
         self.lineWidth = lineWidth
         self.lineColor = lineColor
         self.lineCap = lineCap
@@ -42,7 +49,11 @@ class CodeScannerBoundingBoxView: UIView {
     func setupBorderLayer() {
         let path = CGMutablePath()
         path.addRect(bounds)
-        path.addRoundedRect(in: maskContainer, cornerWidth: layer.cornerRadius, cornerHeight: layer.cornerRadius)
+        path.addRoundedRect(
+            in: maskContainer,
+            cornerWidth: layer.cornerRadius,
+            cornerHeight: layer.cornerRadius
+        )
 
         let maskLayer = CAShapeLayer()
         maskLayer.path = path
@@ -62,7 +73,12 @@ class CodeScannerBoundingBoxView: UIView {
 
     func addAnimatingBarInMask() {
         let gradientLayer = CAGradientLayer()
-        gradientLayer.frame = CGRect(x: maskContainer.minX, y: maskContainer.minY, width: maskContainer.width, height: maskContainer.height / 2)
+        gradientLayer.frame = CGRect(
+            x: maskContainer.minX,
+            y: maskContainer.minY,
+            width: maskContainer.width,
+            height: maskContainer.height / 2
+        )
         gradientLayer.colors = [lineColor.withAlphaComponent(0.5).cgColor,
                                 lineColor.withAlphaComponent(0.2).cgColor,
                                 lineColor.withAlphaComponent(0.1).cgColor,
@@ -80,4 +96,3 @@ class CodeScannerBoundingBoxView: UIView {
         gradientLayer.add(animation, forKey: "position.y")
     }
 }
-

@@ -29,7 +29,7 @@ public class CodeScannerViewController: UIViewController {
                height: boundingBoxSize.height)
     }
 
-    private var scannerBoundingBoxView: CodeScannerBoundingBoxView?
+    private var scannerBoxView: CodeScannerBoxView?
 
     public init(failureAlertTexts: FailureAlertText, delegate: AVCaptureMetadataOutputObjectsDelegate? = nil) {
         self.failureAlertTexts = failureAlertTexts
@@ -153,16 +153,16 @@ public class CodeScannerViewController: UIViewController {
     }
 
     func setupScannerBoundingBox() {
-        scannerBoundingBoxView?.layer.removeAllAnimations()
-        scannerBoundingBoxView?.layer.removeFromSuperlayer()
-        scannerBoundingBoxView = CodeScannerBoundingBoxView(
+        scannerBoxView?.layer.removeAllAnimations()
+        scannerBoxView?.layer.removeFromSuperlayer()
+        scannerBoxView = CodeScannerBoxView(
             frame: view.layer.bounds,
             lineWidth: 2,
             lineColor: maskBorderColor,
             maskSize: boundingBoxSize,
             animationDuration: animationDuration
         )
-        view.addSubview(scannerBoundingBoxView!)
+        view.addSubview(scannerBoxView!)
     }
 
     public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -181,7 +181,7 @@ public class Coordinator: NSObject, AVCaptureMetadataOutputObjectsDelegate {
     var metadataObjectTypes: [AVMetadataObject.ObjectType]
     var boundingBoxSize: CGSize = .zero
 
-    public init(metadataObjectTypes:  [AVMetadataObject.ObjectType] = [.ean8, .ean13], scanResult: Binding<String?>) {
+    public init(metadataObjectTypes: [AVMetadataObject.ObjectType] = [.ean8, .ean13], scanResult: Binding<String?>) {
         self.metadataObjectTypes = metadataObjectTypes
         self._scanResult = scanResult
     }
