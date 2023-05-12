@@ -12,14 +12,17 @@ import AVFoundation
 public struct CodeScanner: UIViewControllerRepresentable {
 
     @Binding public var result: String?
+    @Binding public var isAnimateScanner: Bool
+
     var metaDataObjectTypes: [AVMetadataObject.ObjectType] = []
     var boundingBoxSize: CGSize = .zero
     var maskBorderColor: UIColor = UIColor.white
     var animationDuration: Double = 0.5
-    var isAnimateScanner: Bool = true
 
-    public init(result: Binding<String?>) {
+
+    public init(result: Binding<String?>, isAnimateScanner: Binding<Bool>) {
         _result = result
+        _isAnimateScanner = isAnimateScanner
     }
 
     public func makeUIViewController(context: Context) -> CodeScannerViewController {
