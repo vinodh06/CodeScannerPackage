@@ -14,22 +14,18 @@ class CodeScannerBoundingBoxView: UIView {
     var lineCap: CAShapeLayerLineCap
     var maskSize: CGSize
     var animationDuration: Double
-    var showBorderScanner: Bool
 
-    init(frame: CGRect = .zero, lineWidth: CGFloat = 1, lineColor: UIColor = .white, lineCap: CAShapeLayerLineCap = CAShapeLayerLineCap.round, maskSize: CGSize = .zero, animationDuration: Double = 0.5, showBorderScanner: Bool = true) {
+    init(frame: CGRect = .zero, lineWidth: CGFloat = 1, lineColor: UIColor = .white, lineCap: CAShapeLayerLineCap = CAShapeLayerLineCap.round, maskSize: CGSize = .zero, animationDuration: Double = 0.5) {
         self.lineWidth = lineWidth
         self.lineColor = lineColor
         self.lineCap = lineCap
         self.maskSize = maskSize
         self.animationDuration = animationDuration
-        self.showBorderScanner = showBorderScanner
 
         super.init(frame: frame)
 
-        if self.showBorderScanner {
-            setupBorderLayer()
-            addAnimatingBarInMask()
-        }
+        setupBorderLayer()
+        addAnimatingBarInMask()
     }
 
     required init?(coder: NSCoder) {

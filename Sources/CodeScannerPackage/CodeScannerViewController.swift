@@ -19,7 +19,7 @@ public class CodeScannerViewController: UIViewController {
     var maskBorderColor = UIColor.white
     var animationDuration: Double = 0.5
     var isScannerSupported = false
-    var showBorderScanner = true
+    var showScanningBox = true
     var failureAlertTexts: FailureAlertText
 
     private var maskContainer: CGRect {
@@ -95,13 +95,16 @@ public class CodeScannerViewController: UIViewController {
     public override func viewDidLayoutSubviews() {
         if isScannerSupported {
             setupScanner()
-            setupScannerBoundingBox()
+            if showScanningBox {
+                setupScannerBoundingBox()
+            }
         }
 
         super.viewDidLayoutSubviews()
     }
 
     func setupScanner() {
+
         captureSession = AVCaptureSession()
 
         guard let videoCaptureDevice = AVCaptureDevice.default(for: .video) else {
@@ -158,7 +161,7 @@ public class CodeScannerViewController: UIViewController {
             lineColor: maskBorderColor,
             maskSize: boundingBoxSize,
             animationDuration: animationDuration,
-            showBorderScanner: showBorderScanner
+            showScanningBox: showScanningBox
         )
         view.addSubview(scannerBoundingBoxView!)
     }
