@@ -19,7 +19,8 @@ public class CodeScannerViewController: UIViewController {
     var maskBorderColor = UIColor.white
     var animationDuration: Double = 0.5
     var isScannerSupported = true
-    var isAnimateScanner = true
+    var showBorderScanner = true
+    var failureAlertTexts: FailureAlertText
 
     private var maskContainer: CGRect {
         CGRect(x: (view.bounds.width / 2) - (boundingBoxSize.width / 2),
@@ -30,7 +31,8 @@ public class CodeScannerViewController: UIViewController {
 
     private var scannerBoundingBoxView: CodeScannerBoundingBoxView?
 
-    public init(delegate: AVCaptureMetadataOutputObjectsDelegate? = nil) {
+    public init(failureAlertTexts: FailureAlertText, delegate: AVCaptureMetadataOutputObjectsDelegate? = nil) {
+        self.failureAlertTexts = failureAlertTexts
         self.delegate = delegate
         super.init(nibName: nil, bundle: nil)
     }
@@ -44,22 +46,22 @@ public class CodeScannerViewController: UIViewController {
     }
 
     func scanningNotSupportedError() {
-//        isScannerSupported = false
-//        let alertController = UIAlertController(
-//            title: Constants.cameraFailureTitle(),
-//            message: Constants.cameraFailureDescription(),
-//            preferredStyle: .alert
-//        )
-//        alertController.addAction(
-//            UIAlertAction(
-//                title: Constants.cameraFailureButtonTitle(),
-//                style: .default
-//            ) { [weak self] _ in
-//                self?.dismiss(animated: true)
-//            }
-//        )
-//
-//        present(alertController, animated: true)
+        isScannerSupported = false
+        let alertController = UIAlertController(
+            title: self.failureAlertTexts.title,
+            message: self.failureAlertTexts.description,
+            preferredStyle: .alert
+        )
+        alertController.addAction(
+            UIAlertAction(
+                title: Constants.cameraFailureButtonTitle(),
+                style: .default
+            ) { [weak self] _ in
+                self?.dismiss(animated: true)
+            }
+        )
+
+        present(alertController, animated: true)
         captureSession = nil
     }
 
@@ -153,7 +155,7 @@ public class CodeScannerViewController: UIViewController {
             lineColor: maskBorderColor,
             maskSize: boundingBoxSize,
             animationDuration: animationDuration,
-            isAnimateScanner: isAnimateScanner
+            showBorderScanner: showBorderScanner
         )
         view.addSubview(scannerBoundingBoxView!)
     }
