@@ -43,6 +43,7 @@ public class CodeScannerViewController: UIViewController {
 
     public override func viewDidLoad() {
         super.viewDidLoad()
+        setupScanner()
     }
 
     func scanningNotSupportedError() {
@@ -92,8 +93,8 @@ public class CodeScannerViewController: UIViewController {
     }
 
     public override func viewDidLayoutSubviews() {
-        setupScanner()
         if isScannerSupported {
+            setupScanner()
             setupScannerBoundingBox()
         }
 
