@@ -72,7 +72,7 @@ extension CodeScanner {
         return view
     }
 
-    public func showScannerbox(_ isShow: Bool) -> CodeScanner {
+    public func showScannerBox(_ isShow: Bool) -> CodeScanner {
         var view = self
         view.showScannerBox = isShow
         return view
