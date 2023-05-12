@@ -9,28 +9,36 @@ import UIKit
 import SwiftUI
 import AVFoundation
 
+public typealias FailureAlertText = (title: String, description: String)
+
 public struct CodeScanner: UIViewControllerRepresentable {
 
     @Binding public var result: String?
+
     var metaDataObjectTypes: [AVMetadataObject.ObjectType] = []
     var boundingBoxSize: CGSize = .zero
     var maskBorderColor: UIColor = UIColor.white
     var animationDuration: Double = 0.5
-    var isAnimateScanner: Bool = true
+    var showBorderScanner: Bool = true
+    var failureAlertTexts: (String, String)
 
-    public init(result: Binding<String?>) {
+    public init(result: Binding<String?>, failureAlertTitle: String? = nil, failureAlertDescription: String? = nil) {
         _result = result
+        self.failureAlertTexts = FailureAlertText(
+            title: failureAlertTitle ?? Constants.cameraFailureTitle(),
+            description: failureAlertDescription ?? Constants.cameraFailureDescription()
+        )
     }
 
     public func makeUIViewController(context: Context) -> CodeScannerViewController {
-        CodeScannerViewController(delegate: context.coordinator)
+        CodeScannerViewController(failureAlertTexts: failureAlertTexts, delegate: context.coordinator)
     }
 
     public func updateUIViewController(_ uiViewController: CodeScannerViewController, context: Context) {
         uiViewController.boundingBoxSize = boundingBoxSize
         uiViewController.maskBorderColor = maskBorderColor
         uiViewController.animationDuration = animationDuration
-        uiViewController.isAnimateScanner = isAnimateScanner
+        uiViewController.showBorderScanner = showBorderScanner
     }
 
     public func makeCoordinator() -> Coordinator {
@@ -63,9 +71,9 @@ extension CodeScanner {
         return view
     }
 
-    public func animateScanner(_ isAnimateScanner: Bool) -> CodeScanner {
+    public func animateScanner(_ showBorderScanner: Bool) -> CodeScanner {
         var view = self
-        view.isAnimateScanner = isAnimateScanner
+        view.showBorderScanner = showBorderScanner
         return view
     }
 }
