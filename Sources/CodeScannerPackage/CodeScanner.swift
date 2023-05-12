@@ -15,7 +15,7 @@ public struct CodeScanner: UIViewControllerRepresentable {
 
     @Binding public var result: String?
 
-    var metaDataObjectTypes: [AVMetadataObject.ObjectType] = []
+    var metadataObjectTypes: [AVMetadataObject.ObjectType] = []
     var boundingBoxSize: CGSize = .zero
     var maskBorderColor: UIColor = UIColor.white
     var animationDuration: Double = 0.5
@@ -35,22 +35,22 @@ public struct CodeScanner: UIViewControllerRepresentable {
     }
 
     public func updateUIViewController(_ uiViewController: CodeScannerViewController, context: Context) {
+        uiViewController.metadataObjectTypes = metadataObjectTypes
         uiViewController.boundingBoxSize = boundingBoxSize
         uiViewController.maskBorderColor = maskBorderColor
         uiViewController.animationDuration = animationDuration
         uiViewController.showScannerBox = showScannerBox
-        uiViewController.metaDataObjectTypes = metaDataObjectTypes
     }
 
     public func makeCoordinator() -> Coordinator {
-        Coordinator($result)
+        Coordinator(metadataObjectTypes: metadataObjectTypes, scanResult: $result)
     }
 }
 
 extension CodeScanner {
     public func metadataObjectTypes(_ metadataObjects: [AVMetadataObject.ObjectType]) -> CodeScanner {
         var view = self
-        view.metaDataObjectTypes = metadataObjects
+        view.metadataObjectTypes = metadataObjects
         return view
     }
 

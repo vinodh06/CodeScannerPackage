@@ -14,7 +14,7 @@ public class CodeScannerViewController: UIViewController {
     var captureSession: AVCaptureSession!
     var previewLayer: AVCaptureVideoPreviewLayer!
     var delegate: AVCaptureMetadataOutputObjectsDelegate?
-    var metaDataObjectTypes: [AVMetadataObject.ObjectType] = []
+    var metadataObjectTypes: [AVMetadataObject.ObjectType] = []
     var boundingBoxSize: CGSize = .zero
     var maskBorderColor = UIColor.white
     var animationDuration: Double = 0.5
@@ -133,7 +133,7 @@ public class CodeScannerViewController: UIViewController {
         if captureSession.canAddOutput(metadataOutput) {
             captureSession.addOutput(metadataOutput)
             metadataOutput.setMetadataObjectsDelegate(delegate, queue: DispatchQueue.main)
-            metadataOutput.metadataObjectTypes = metaDataObjectTypes
+            metadataOutput.metadataObjectTypes = metadataObjectTypes
         } else {
             scanningNotSupportedError()
             return
@@ -178,10 +178,11 @@ public class CodeScannerViewController: UIViewController {
 public class Coordinator: NSObject, AVCaptureMetadataOutputObjectsDelegate {
 
     @Binding var scanResult: String?
-    var metaDataObjectTypes: [AVMetadataObject.ObjectType] = []
+    var metadataObjectTypes: [AVMetadataObject.ObjectType]
     var boundingBoxSize: CGSize = .zero
 
-    public init(_ scanResult: Binding<String?>) {
+    public init(metadataObjectTypes:  [AVMetadataObject.ObjectType] = [.ean8, .ean13], scanResult: Binding<String?>) {
+        self.metadataObjectTypes = metadataObjectTypes
         self._scanResult = scanResult
     }
 
@@ -193,7 +194,7 @@ public class Coordinator: NSObject, AVCaptureMetadataOutputObjectsDelegate {
         }
         // Get the metadata object.
         if let metadataObj = metadataObjects[0] as? AVMetadataMachineReadableCodeObject,
-           metaDataObjectTypes.contains(metadataObj.type),
+           metadataObjectTypes.contains(metadataObj.type),
            let result = metadataObj.stringValue {
             scanResult = result
         }

@@ -9,14 +9,14 @@ CodeScannerPackage is a package for scanning metadata objects such as barcodes a
 
 2. And then create a scanner view like this one
 
-CodeScannerView(showScanner: $showScanner, metaDataObjectTypes: [.ean8, .ean13]) { barCode in print(barCode)
+CodeScannerView(showScanner: $showScanner, metadataObjectTypes: [.ean8, .ean13]) { barCode in print(barCode)
 }
 
 There are 3 parameters that must be passed when initialising CodeScannerView
 
 1. showScanner - sends the binding bool variable to show or hide the scanner. Once the code is scanned, this variable is set to false to close the scanner view.
 
-2. metaDataObjectTypes - sends the metadata objects in this argument.
+2. metadataObjectTypes - sends the metadata objects in this argument.
 
 For barcode - [.ean8, .ean13, .pdf417...] must be sent
 
