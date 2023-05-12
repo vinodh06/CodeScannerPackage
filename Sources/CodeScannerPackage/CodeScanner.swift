@@ -30,6 +30,7 @@ public struct CodeScanner: UIViewControllerRepresentable {
         uiViewController.boundingBoxSize = boundingBoxSize
         uiViewController.maskBorderColor = maskBorderColor
         uiViewController.animationDuration = animationDuration
+        uiViewController.isAnimateScanner = isAnimateScanner
     }
 
     public func makeCoordinator() -> Coordinator {
