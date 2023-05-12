@@ -18,7 +18,7 @@ public class CodeScannerViewController: UIViewController {
     var boundingBoxSize: CGSize = .zero
     var maskBorderColor = UIColor.white
     var animationDuration: Double = 0.5
-    var isScannerSupported = false
+    var isScannerSupported = true
     var isAnimateScanner = true
 
     private var maskContainer: CGRect {
