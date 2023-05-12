@@ -19,7 +19,7 @@ public struct CodeScanner: UIViewControllerRepresentable {
     var boundingBoxSize: CGSize = .zero
     var maskBorderColor: UIColor = UIColor.white
     var animationDuration: Double = 0.5
-    var showScanningBox: Bool = true
+    var showScannerBox: Bool = true
     var failureAlertTexts: (String, String)
 
     public init(result: Binding<String?>, failureAlertTitle: String? = nil, failureAlertDescription: String? = nil) {
@@ -38,7 +38,8 @@ public struct CodeScanner: UIViewControllerRepresentable {
         uiViewController.boundingBoxSize = boundingBoxSize
         uiViewController.maskBorderColor = maskBorderColor
         uiViewController.animationDuration = animationDuration
-        uiViewController.showScanningBox = showScanningBox
+        uiViewController.showScannerBox = showScannerBox
+        uiViewController.metaDataObjectTypes = metaDataObjectTypes
     }
 
     public func makeCoordinator() -> Coordinator {
@@ -71,9 +72,9 @@ extension CodeScanner {
         return view
     }
 
-    public func animateScanner(_ showScanningBox: Bool) -> CodeScanner {
+    public func animateScanner(_ showScannerBox: Bool) -> CodeScanner {
         var view = self
-        view.showScanningBox = showScanningBox
+        view.showScannerBox = showScannerBox
         return view
     }
 }

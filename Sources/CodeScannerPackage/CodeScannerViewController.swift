@@ -19,7 +19,7 @@ public class CodeScannerViewController: UIViewController {
     var maskBorderColor = UIColor.white
     var animationDuration: Double = 0.5
     var isScannerSupported = false
-    var showScanningBox = true
+    var showScannerBox = true
     var failureAlertTexts: FailureAlertText
 
     private var maskContainer: CGRect {
@@ -95,7 +95,7 @@ public class CodeScannerViewController: UIViewController {
     public override func viewDidLayoutSubviews() {
         if isScannerSupported {
             setupScanner()
-            if showScanningBox {
+            if showScannerBox {
                 setupScannerBoundingBox()
             }
         }
