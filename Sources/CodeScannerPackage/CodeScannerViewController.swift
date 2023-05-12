@@ -160,8 +160,7 @@ public class CodeScannerViewController: UIViewController {
             lineWidth: 2,
             lineColor: maskBorderColor,
             maskSize: boundingBoxSize,
-            animationDuration: animationDuration,
-            showScanningBox: showScanningBox
+            animationDuration: animationDuration
         )
         view.addSubview(scannerBoundingBoxView!)
     }
