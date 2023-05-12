@@ -9,29 +9,31 @@ import UIKit
 
 class CodeScannerBoundingBoxView: UIView {
 
-    var lineWidth = CGFloat(1.0)
-    var lineColor = UIColor.white
-    var lineCap = CAShapeLayerLineCap.round
-    var maskSize = CGSize.zero
-    var animationDuration = 0.5
+    var lineWidth: CGFloat
+    var lineColor: UIColor
+    var lineCap: CAShapeLayerLineCap
+    var maskSize: CGSize
+    var animationDuration: Double
+    var isAnimateScanner: Bool
 
-    init(frame: CGRect = .zero, lineWidth: CGFloat = 1, lineColor: UIColor = .white, maskSize: CGSize = .zero, animationDuration: Double = 0.5) {
+    init(frame: CGRect = .zero, lineWidth: CGFloat = 1, lineColor: UIColor = .white, lineCap: CAShapeLayerLineCap = CAShapeLayerLineCap.round, maskSize: CGSize = .zero, animationDuration: Double = 0.5, isAnimateScanner: Bool = true) {
         self.lineWidth = lineWidth
         self.lineColor = lineColor
+        self.lineCap = lineCap
         self.maskSize = maskSize
         self.animationDuration = animationDuration
+        self.isAnimateScanner = isAnimateScanner
 
         super.init(frame: frame)
 
         setupBorderLayer()
-        addAnimatingBarInMask()
+        if self.isAnimateScanner {
+            addAnimatingBarInMask()
+        }
     }
 
     required init?(coder: NSCoder) {
-        super.init(coder: coder)
-
-        self.setupBorderLayer()
-        self.addAnimatingBarInMask()
+        fatalError("init(coder:) has not been implemented")
     }
 
     private var maskContainer: CGRect {

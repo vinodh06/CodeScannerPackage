@@ -16,6 +16,7 @@ public struct CodeScanner: UIViewControllerRepresentable {
     var boundingBoxSize: CGSize = .zero
     var maskBorderColor: UIColor = UIColor.white
     var animationDuration: Double = 0.5
+    var isAnimateScanner: Bool = true
 
     public init(result: Binding<String?>) {
         _result = result
@@ -58,6 +59,12 @@ extension CodeScanner {
     public func animationDuration(_ animationDuration: Double) -> CodeScanner {
         var view = self
         view.animationDuration = animationDuration
+        return view
+    }
+
+    public func animateScanner(_ isAnimateScanner: Bool) -> CodeScanner {
+        var view = self
+        view.isAnimateScanner = isAnimateScanner
         return view
     }
 }
