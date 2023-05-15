@@ -227,4 +227,3 @@ extension Coordinator: CodeScanable {
         isSessionStarted = true
     }
 }
-

@@ -33,7 +33,11 @@ public struct CodeScanner: UIViewControllerRepresentable {
     }
 
     public func makeUIViewController(context: Context) -> CodeScannerViewController {
-        CodeScannerViewController(failureAlertTexts: failureAlertTexts, delegate: context.coordinator)
+        CodeScannerViewController(
+            failureAlertTexts: failureAlertTexts,
+            delegate: context.coordinator,
+            codeScannerDelegate: context.coordinator
+        )
     }
 
     public func updateUIViewController(_ uiViewController: CodeScannerViewController, context: Context) {
@@ -45,7 +49,11 @@ public struct CodeScanner: UIViewControllerRepresentable {
     }
 
     public func makeCoordinator() -> Coordinator {
-        Coordinator(metadataObjectTypes: metadataObjectTypes, scanResult: $result, isSessionStarted: $isSessionStarted)
+        Coordinator(
+            metadataObjectTypes: metadataObjectTypes,
+            scanResult: $result,
+            isSessionStarted: $isSessionStarted
+        )
     }
 }
 
