@@ -14,6 +14,7 @@ public typealias FailureAlertText = (title: String, description: String)
 public struct CodeScanner: UIViewControllerRepresentable {
 
     @Binding public var result: String?
+    @Binding public var isSessionStarted: Bool?
 
     var metadataObjectTypes: [AVMetadataObject.ObjectType] = []
     var boundingBoxSize: CGSize = .zero
@@ -22,8 +23,9 @@ public struct CodeScanner: UIViewControllerRepresentable {
     var showScannerBox: Bool = true
     var failureAlertTexts: (String, String)
 
-    public init(result: Binding<String?>, failureAlertTitle: String? = nil, failureAlertDescription: String? = nil) {
+    public init(result: Binding<String?>, isSessionStarted: Binding<Bool?>, failureAlertTitle: String? = nil, failureAlertDescription: String? = nil) {
         _result = result
+        _isSessionStarted = isSessionStarted
         self.failureAlertTexts = FailureAlertText(
             title: failureAlertTitle ?? Constants.cameraFailureTitle(),
             description: failureAlertDescription ?? Constants.cameraFailureDescription()
@@ -31,7 +33,7 @@ public struct CodeScanner: UIViewControllerRepresentable {
     }
 
     public func makeUIViewController(context: Context) -> CodeScannerViewController {
-        CodeScannerViewController(failureAlertTexts: failureAlertTexts, delegate: context.coordinator)
+        CodeScannerViewController(failureAlertTexts: failureAlertTexts, delegate: context.coordinator, codeScannerDelegate: context.coordinator)
     }
 
     public func updateUIViewController(_ uiViewController: CodeScannerViewController, context: Context) {
@@ -43,7 +45,7 @@ public struct CodeScanner: UIViewControllerRepresentable {
     }
 
     public func makeCoordinator() -> Coordinator {
-        Coordinator(metadataObjectTypes: metadataObjectTypes, scanResult: $result)
+        Coordinator(metadataObjectTypes: metadataObjectTypes, scanResult: $result, isSessionStarted: $isSessionStarted)
     }
 }
 
@@ -66,15 +68,16 @@ extension CodeScanner {
         return view
     }
 
-    public func animationDuration(_ duration: Double) -> CodeScanner {
+    public func animationDuration(_ animationDuration: Double) -> CodeScanner {
         var view = self
-        view.animationDuration = duration
+        view.animationDuration = animationDuration
         return view
     }
 
-    public func showScannerBox(_ isShow: Bool) -> CodeScanner {
+    public func animateScanner(_ showScannerBox: Bool) -> CodeScanner {
         var view = self
-        view.showScannerBox = isShow
+        view.showScannerBox = showScannerBox
         return view
     }
 }
+
