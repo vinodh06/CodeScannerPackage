@@ -9,11 +9,16 @@ import UIKit
 import AVFoundation
 import SwiftUI
 
+protocol CodeScanable {
+    func sessionStarted()
+}
+
 public class CodeScannerViewController: UIViewController {
 
     var captureSession: AVCaptureSession!
     var previewLayer: AVCaptureVideoPreviewLayer!
     var delegate: AVCaptureMetadataOutputObjectsDelegate?
+    var codeScannerDelegate: CodeScanable
     var metadataObjectTypes: [AVMetadataObject.ObjectType] = []
     var boundingBoxSize: CGSize = .zero
     var maskBorderColor = UIColor.white
@@ -21,6 +26,8 @@ public class CodeScannerViewController: UIViewController {
     var isScannerSupported = false
     var showScannerBox = true
     var failureAlertTexts: FailureAlertText
+    public var isSessionStarted = false
+
 
     private var maskContainer: CGRect {
         CGRect(x: (view.bounds.width / 2) - (boundingBoxSize.width / 2),
@@ -31,9 +38,14 @@ public class CodeScannerViewController: UIViewController {
 
     private var scannerBoxView: CodeScannerBoxView?
 
-    public init(failureAlertTexts: FailureAlertText, delegate: AVCaptureMetadataOutputObjectsDelegate? = nil) {
+    init(
+        failureAlertTexts: FailureAlertText,
+        delegate: AVCaptureMetadataOutputObjectsDelegate? = nil,
+        codeScannerDelegate: CodeScanable
+    ) {
         self.failureAlertTexts = failureAlertTexts
         self.delegate = delegate
+        self.codeScannerDelegate = codeScannerDelegate
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -43,6 +55,14 @@ public class CodeScannerViewController: UIViewController {
 
     public override func viewDidLoad() {
         super.viewDidLoad()
+
+        NotificationCenter.default.addObserver(self, selector: #selector(sessionDidStartRunning), name: .AVCaptureSessionDidStartRunning, object: captureSession)
+    }
+
+    @objc
+    func sessionDidStartRunning(notification: NSNotification) {
+        isSessionStarted = true
+        codeScannerDelegate.sessionStarted()
     }
 
     func scanningNotSupportedError() {
@@ -95,7 +115,7 @@ public class CodeScannerViewController: UIViewController {
     public override func viewDidLayoutSubviews() {
         if isScannerSupported {
             setupScanner()
-            if showScannerBox {
+            if showScannerBox && isSessionStarted {
                 setupScannerBoundingBox()
             }
         }
@@ -178,12 +198,13 @@ public class CodeScannerViewController: UIViewController {
 public class Coordinator: NSObject, AVCaptureMetadataOutputObjectsDelegate {
 
     @Binding var scanResult: String?
+    @Binding var isSessionStarted: Bool?
     var metadataObjectTypes: [AVMetadataObject.ObjectType]
-    var boundingBoxSize: CGSize = .zero
 
-    public init(metadataObjectTypes: [AVMetadataObject.ObjectType] = [.ean8, .ean13], scanResult: Binding<String?>) {
+    public init(metadataObjectTypes:  [AVMetadataObject.ObjectType] = [.ean8, .ean13], scanResult: Binding<String?>, isSessionStarted: Binding<Bool?>) {
         self.metadataObjectTypes = metadataObjectTypes
         self._scanResult = scanResult
+        self._isSessionStarted = isSessionStarted
     }
 
     public func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
@@ -200,3 +221,10 @@ public class Coordinator: NSObject, AVCaptureMetadataOutputObjectsDelegate {
         }
     }
 }
+
+extension Coordinator: CodeScanable {
+    func sessionStarted() {
+        isSessionStarted = true
+    }
+}
+
