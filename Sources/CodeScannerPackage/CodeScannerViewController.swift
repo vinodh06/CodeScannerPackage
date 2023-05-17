@@ -11,6 +11,7 @@ import SwiftUI
 
 protocol CodeScanable {
     func sessionStarted()
+    func cameraNotSupported()
 }
 
 public class CodeScannerViewController: UIViewController {
@@ -25,7 +26,6 @@ public class CodeScannerViewController: UIViewController {
     var animationDuration: Double = 0.5
     var isScannerSupported = false
     var showScannerBox = true
-    var failureAlertTexts: FailureAlertText
     public var isSessionStarted = false
 
 
@@ -39,11 +39,9 @@ public class CodeScannerViewController: UIViewController {
     private var scannerBoxView: CodeScannerBoxView?
 
     init(
-        failureAlertTexts: FailureAlertText,
         delegate: AVCaptureMetadataOutputObjectsDelegate? = nil,
         codeScannerDelegate: CodeScanable
     ) {
-        self.failureAlertTexts = failureAlertTexts
         self.delegate = delegate
         self.codeScannerDelegate = codeScannerDelegate
         super.init(nibName: nil, bundle: nil)
@@ -67,22 +65,23 @@ public class CodeScannerViewController: UIViewController {
 
     func scanningNotSupportedError() {
         isScannerSupported = false
-        let alertController = UIAlertController(
-            title: self.failureAlertTexts.title,
-            message: self.failureAlertTexts.description,
-            preferredStyle: .alert
-        )
-        alertController.addAction(
-            UIAlertAction(
-                title: Constants.cameraFailureButtonTitle(),
-                style: .default
-            ) { [weak self] _ in
-                self?.dismiss(animated: true)
-            }
-        )
-
-        present(alertController, animated: true)
+        self.codeScannerDelegate.cameraNotSupported()
         captureSession = nil
+//        let alertController = UIAlertController(
+//            title: self.failureAlertTexts.title,
+//            message: self.failureAlertTexts.description,
+//            preferredStyle: .alert
+//        )
+//        alertController.addAction(
+//            UIAlertAction(
+//                title: Constants.cameraFailureButtonTitle(),
+//                style: .default
+//            ) { [weak self] _ in
+//                self?.dismiss(animated: true)
+//            }
+//        )
+//
+//        present(alertController, animated: true)
     }
 
     public override func viewWillAppear(_ animated: Bool) {
@@ -199,12 +198,19 @@ public class Coordinator: NSObject, AVCaptureMetadataOutputObjectsDelegate {
 
     @Binding var scanResult: String?
     @Binding var isSessionStarted: Bool?
+    @Binding var isCameraSupported: Bool?
     var metadataObjectTypes: [AVMetadataObject.ObjectType]
 
-    public init(metadataObjectTypes:  [AVMetadataObject.ObjectType] = [.ean8, .ean13], scanResult: Binding<String?>, isSessionStarted: Binding<Bool?>) {
+    public init(
+        metadataObjectTypes:  [AVMetadataObject.ObjectType] = [.ean8, .ean13],
+        scanResult: Binding<String?>,
+        isSessionStarted: Binding<Bool?>,
+        isCameraSupported: Binding<Bool?>
+    ) {
         self.metadataObjectTypes = metadataObjectTypes
         self._scanResult = scanResult
         self._isSessionStarted = isSessionStarted
+        self._isCameraSupported = isCameraSupported
     }
 
     public func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
@@ -225,5 +231,8 @@ public class Coordinator: NSObject, AVCaptureMetadataOutputObjectsDelegate {
 extension Coordinator: CodeScanable {
     func sessionStarted() {
         isSessionStarted = true
+    }
+    func cameraNotSupported() {
+        isCameraSupported = false
     }
 }

@@ -9,32 +9,26 @@ import UIKit
 import SwiftUI
 import AVFoundation
 
-public typealias FailureAlertText = (title: String, description: String)
-
 public struct CodeScanner: UIViewControllerRepresentable {
 
     @Binding public var result: String?
     @Binding public var isSessionStarted: Bool?
+    @Binding public var isCameraSupported: Bool?
 
     var metadataObjectTypes: [AVMetadataObject.ObjectType] = []
     var boundingBoxSize: CGSize = .zero
     var maskBorderColor: UIColor = UIColor.white
     var animationDuration: Double = 0.5
     var showScannerBox: Bool = true
-    var failureAlertTexts: (String, String)
 
-    public init(result: Binding<String?>, isSessionStarted: Binding<Bool?>, failureAlertTitle: String? = nil, failureAlertDescription: String? = nil) {
+    public init(result: Binding<String?>, isSessionStarted: Binding<Bool?>, isCameraSupported: Binding<Bool?>) {
         _result = result
         _isSessionStarted = isSessionStarted
-        self.failureAlertTexts = FailureAlertText(
-            title: failureAlertTitle ?? Constants.cameraFailureTitle(),
-            description: failureAlertDescription ?? Constants.cameraFailureDescription()
-        )
+        _isCameraSupported = isCameraSupported
     }
 
     public func makeUIViewController(context: Context) -> CodeScannerViewController {
         CodeScannerViewController(
-            failureAlertTexts: failureAlertTexts,
             delegate: context.coordinator,
             codeScannerDelegate: context.coordinator
         )
@@ -52,7 +46,8 @@ public struct CodeScanner: UIViewControllerRepresentable {
         Coordinator(
             metadataObjectTypes: metadataObjectTypes,
             scanResult: $result,
-            isSessionStarted: $isSessionStarted
+            isSessionStarted: $isSessionStarted,
+            isCameraSupported: $isCameraSupported
         )
     }
 }
