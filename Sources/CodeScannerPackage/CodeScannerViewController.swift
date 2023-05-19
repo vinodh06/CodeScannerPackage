@@ -12,6 +12,7 @@ import SwiftUI
 protocol CodeScanable {
     func sessionStarted()
     func cameraNotSupported()
+    func hasNoCameraAccess()
 }
 
 public class CodeScannerViewController: UIViewController {
@@ -20,20 +21,22 @@ public class CodeScannerViewController: UIViewController {
     var previewLayer: AVCaptureVideoPreviewLayer!
     var delegate: AVCaptureMetadataOutputObjectsDelegate?
     var codeScannerDelegate: CodeScanable
-    var metadataObjectTypes: [AVMetadataObject.ObjectType] = []
-    var boundingBoxSize: CGSize = .zero
-    var maskBorderColor = UIColor.white
-    var animationDuration: Double = 0.5
-    var isScannerSupported = false
-    var showScannerBox = true
-    public var isSessionStarted = false
+    var metadataObjectTypes: [AVMetadataObject.ObjectType]  = []
+    var boundingBoxSize: CGSize                             = .zero
+    var maskBorderColor                                     = UIColor.white
+    var animationDuration                                   = 0.5
+    var isScannerSupported                                  = false
+    var showScannerBox                                      = true
+    public var isSessionStarted                             = false
 
 
     private var maskContainer: CGRect {
-        CGRect(x: (view.bounds.width / 2) - (boundingBoxSize.width / 2),
-               y: (view.bounds.height / 2) - (boundingBoxSize.height / 2),
-               width: boundingBoxSize.width,
-               height: boundingBoxSize.height)
+        CGRect(
+            x: (view.bounds.width / 2) - (boundingBoxSize.width / 2),
+            y: (view.bounds.height / 2) - (boundingBoxSize.height / 2),
+            width: boundingBoxSize.width,
+            height: boundingBoxSize.height
+        )
     }
 
     private var scannerBoxView: CodeScannerBoxView?
@@ -42,8 +45,8 @@ public class CodeScannerViewController: UIViewController {
         delegate: AVCaptureMetadataOutputObjectsDelegate? = nil,
         codeScannerDelegate: CodeScanable
     ) {
-        self.delegate = delegate
-        self.codeScannerDelegate = codeScannerDelegate
+        self.delegate               = delegate
+        self.codeScannerDelegate    = codeScannerDelegate
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -54,7 +57,12 @@ public class CodeScannerViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
 
-        NotificationCenter.default.addObserver(self, selector: #selector(sessionDidStartRunning), name: .AVCaptureSessionDidStartRunning, object: captureSession)
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(sessionDidStartRunning),
+            name: .AVCaptureSessionDidStartRunning,
+            object: captureSession
+        )
     }
 
     @objc
@@ -67,27 +75,12 @@ public class CodeScannerViewController: UIViewController {
         isScannerSupported = false
         self.codeScannerDelegate.cameraNotSupported()
         captureSession = nil
-//        let alertController = UIAlertController(
-//            title: self.failureAlertTexts.title,
-//            message: self.failureAlertTexts.description,
-//            preferredStyle: .alert
-//        )
-//        alertController.addAction(
-//            UIAlertAction(
-//                title: Constants.cameraFailureButtonTitle(),
-//                style: .default
-//            ) { [weak self] _ in
-//                self?.dismiss(animated: true)
-//            }
-//        )
-//
-//        present(alertController, animated: true)
     }
 
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        setupScanner()
+        checkCameraAccess()
         if captureSession?.isRunning == false {
             DispatchQueue.global(qos: .background).async {
                 self.captureSession.startRunning()
@@ -113,13 +106,34 @@ public class CodeScannerViewController: UIViewController {
 
     public override func viewDidLayoutSubviews() {
         if isScannerSupported {
-            setupScanner()
+            checkCameraAccess()
             if showScannerBox && isSessionStarted {
                 setupScannerBoundingBox()
             }
         }
 
         super.viewDidLayoutSubviews()
+    }
+
+    func checkCameraAccess() {
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .denied:
+            self.codeScannerDelegate.hasNoCameraAccess()
+        case .restricted:
+            self.codeScannerDelegate.hasNoCameraAccess()
+        case .authorized:
+            setupScanner()
+        case .notDetermined:
+            AVCaptureDevice.requestAccess(for: .video) { [weak self] success in
+                if success {
+                    self?.setupScanner()
+                } else {
+                    self?.codeScannerDelegate.hasNoCameraAccess()
+                }
+            }
+        @unknown default:
+            self.codeScannerDelegate.hasNoCameraAccess()
+        }
     }
 
     func setupScanner() {
@@ -197,20 +211,23 @@ public class CodeScannerViewController: UIViewController {
 public class Coordinator: NSObject, AVCaptureMetadataOutputObjectsDelegate {
 
     @Binding var scanResult: String?
-    @Binding var isSessionStarted: Bool?
-    @Binding var isCameraSupported: Bool?
+    @Binding var isSessionStarted: Bool
+    @Binding var isCameraSupported: Bool
+    @Binding var hasCameraAccess: Bool
     var metadataObjectTypes: [AVMetadataObject.ObjectType]
 
     public init(
         metadataObjectTypes:  [AVMetadataObject.ObjectType] = [.ean8, .ean13],
         scanResult: Binding<String?>,
-        isSessionStarted: Binding<Bool?>,
-        isCameraSupported: Binding<Bool?>
+        isSessionStarted: Binding<Bool>,
+        isCameraSupported: Binding<Bool>,
+        hasCameraAccess: Binding<Bool>
     ) {
-        self.metadataObjectTypes = metadataObjectTypes
-        self._scanResult = scanResult
-        self._isSessionStarted = isSessionStarted
-        self._isCameraSupported = isCameraSupported
+        self.metadataObjectTypes    = metadataObjectTypes
+        self._scanResult            = scanResult
+        self._isSessionStarted      = isSessionStarted
+        self._isCameraSupported     = isCameraSupported
+        self._hasCameraAccess       = hasCameraAccess
     }
 
     public func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
@@ -222,17 +239,23 @@ public class Coordinator: NSObject, AVCaptureMetadataOutputObjectsDelegate {
         // Get the metadata object.
         if let metadataObj = metadataObjects[0] as? AVMetadataMachineReadableCodeObject,
            metadataObjectTypes.contains(metadataObj.type),
-           let result = metadataObj.stringValue {
-            scanResult = result
+           let result   = metadataObj.stringValue {
+            scanResult  = result
         }
     }
 }
 
 extension Coordinator: CodeScanable {
+
     func sessionStarted() {
         isSessionStarted = true
     }
+
     func cameraNotSupported() {
         isCameraSupported = false
+    }
+
+    func hasNoCameraAccess() {
+        hasCameraAccess = false
     }
 }
