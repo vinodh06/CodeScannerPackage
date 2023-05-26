@@ -79,13 +79,17 @@ public class CodeScannerViewController: UIViewController {
 
     public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
-        checkCameraAccess()
-        if captureSession?.isRunning == false {
-            DispatchQueue.global(qos: .background).async {
-                self.captureSession.startRunning()
+        if UIImagePickerController.isCameraDeviceAvailable(.rear) {
+            checkCameraAccess()
+            if captureSession?.isRunning == false {
+                DispatchQueue.global(qos: .background).async {
+                    self.captureSession.startRunning()
+                }
             }
+        } else {
+            scanningNotSupportedError()
         }
+
     }
 
     public override func viewWillDisappear(_ animated: Bool) {
