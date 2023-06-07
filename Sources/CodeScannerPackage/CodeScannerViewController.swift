@@ -22,24 +22,8 @@ public class CodeScannerViewController: UIViewController {
     var delegate: AVCaptureMetadataOutputObjectsDelegate?
     var codeScannerDelegate: CodeScanable
     var metadataObjectTypes: [AVMetadataObject.ObjectType]  = []
-    var boundingBoxSize: CGSize                             = .zero
-    var maskBorderColor                                     = UIColor.white
-    var animationDuration                                   = 0.5
     var isScannerSupported                                  = false
-    var showScannerBox                                      = true
     public var isSessionStarted                             = false
-
-
-    private var maskContainer: CGRect {
-        CGRect(
-            x: (view.bounds.width / 2) - (boundingBoxSize.width / 2),
-            y: (view.bounds.height / 2) - (boundingBoxSize.height / 2),
-            width: boundingBoxSize.width,
-            height: boundingBoxSize.height
-        )
-    }
-
-    private var scannerBoxView: CodeScannerBoxView?
 
     init(
         delegate: AVCaptureMetadataOutputObjectsDelegate? = nil,
@@ -111,11 +95,7 @@ public class CodeScannerViewController: UIViewController {
     public override func viewDidLayoutSubviews() {
         if isScannerSupported {
             checkCameraAccess()
-            if showScannerBox && isSessionStarted {
-                setupScannerBoundingBox()
-            }
         }
-
         super.viewDidLayoutSubviews()
     }
 
@@ -187,19 +167,6 @@ public class CodeScannerViewController: UIViewController {
         DispatchQueue.global(qos: .background).async { [weak self] in
             self?.captureSession.startRunning()
         }
-    }
-
-    func setupScannerBoundingBox() {
-        scannerBoxView?.layer.removeAllAnimations()
-        scannerBoxView?.layer.removeFromSuperlayer()
-        scannerBoxView = CodeScannerBoxView(
-            frame: view.layer.bounds,
-            lineWidth: 2,
-            lineColor: maskBorderColor,
-            maskSize: boundingBoxSize,
-            animationDuration: animationDuration
-        )
-        view.addSubview(scannerBoxView!)
     }
 
     public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
